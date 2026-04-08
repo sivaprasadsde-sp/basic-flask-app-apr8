@@ -1,0 +1,36 @@
+name: Deploy Flask to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to EC2
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd YOUR_REPO
+
+          git pull
+
+          # Create venv if not exists
+          if [ ! -d "venv" ]; then
+            python3 -m venv venv
+          fi
+
+          source venv/bin/activate
+
+          pip install -r requirements.txt
+
+          pkill -f app.py || true
+
+          nohup python app.py > output.log 2>&1 &
+        EOF
