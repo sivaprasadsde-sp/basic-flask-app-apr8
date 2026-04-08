@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "New version deployed to EC2 🚀"
+    return "Third version deployed to EC2, Hurray 🚀"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
